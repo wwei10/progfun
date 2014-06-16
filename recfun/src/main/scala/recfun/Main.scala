@@ -28,13 +28,35 @@ object Main {
    * Exercise 2
    */
   def balance(chars: List[Char]): Boolean = {
-    true
+    def loop(chars: List[Char], leftPar: Int, rightPar: Int): Boolean = {
+      if (chars.isEmpty) {
+        if (leftPar == rightPar) true else false
+      } else if (leftPar < rightPar) {
+        false
+      } else {
+        if (chars.head == '(') {
+          loop(chars.tail, leftPar + 1, rightPar)
+        } else if (chars.head == ')') {
+          loop(chars.tail, leftPar, rightPar + 1)
+        } else {
+          loop(chars.tail, leftPar, rightPar)
+        }
+      }
+    }
+    loop(chars, 0, 0)
   }
 
   /**
    * Exercise 3
    */
   def countChange(money: Int, coins: List[Int]): Int = {
-    0
+    if (coins.isEmpty) 0
+    else if (money < 0) {
+      0
+    } else if (money == 0) {
+      1
+    } else {
+      countChange(money - coins.head, coins) + countChange(money, coins.tail)
+    }
   }
 }
