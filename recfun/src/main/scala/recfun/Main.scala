@@ -30,7 +30,7 @@ object Main {
   def balance(chars: List[Char]): Boolean = {
     def loop(chars: List[Char], leftPar: Int, rightPar: Int): Boolean = {
       if (chars.isEmpty) {
-        if (leftPar == rightPar) true else false
+        leftPar == rightPar
       } else if (leftPar < rightPar) {
         false
       } else {
