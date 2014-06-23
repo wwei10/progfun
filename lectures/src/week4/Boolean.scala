@@ -21,7 +21,7 @@ object False extends Boolean {
   override def toString = "False"
 }
 
-object Test {
+object BooleanTest {
   def main(args: Array[String]) {
     println("True: " + True)
     println("False: " + False)
