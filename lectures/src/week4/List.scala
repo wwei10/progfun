@@ -25,3 +25,11 @@ object List {
   def apply[T](x1: T): List[T] = new Cons(x1, new Nil)
   def apply[T]() = new Nil
 }
+
+object TestList {
+  def main(args: Array[String]) {
+    println(List())
+    println(List(1))
+    println(List(1, 2))
+  }
+}
