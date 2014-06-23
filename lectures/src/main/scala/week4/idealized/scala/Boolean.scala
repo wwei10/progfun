@@ -1,4 +1,4 @@
-package week4
+package week4.idealized.scala
 
 abstract class Boolean {
   def ifThenElse[T](t: => T, e: => T): T
