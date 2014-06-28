@@ -1,6 +1,6 @@
 package week5
 
-object InsertionSort {
+object ListUtil {
 
   def iSort(list: List[Int]): List[Int] = list match {
     case Nil => Nil
