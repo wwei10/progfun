@@ -25,7 +25,7 @@ object NQueens {
           queen <- queens
           col <- (0 until n)
           if isSafe(col, queen)
-         } yield col :: queen
+        } yield col :: queen
       }
     }
     placeQueens(n)
