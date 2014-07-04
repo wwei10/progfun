@@ -28,16 +28,22 @@ object Anagrams {
    */
   val dictionary: List[Word] = loadDictionary
 
-  /** Converts the word into its character occurence list.
+  /** Converts the word into its character occurrence list.
    *  
    *  Note: the uppercase and lowercase version of the character are treated as the
    *  same character, and are represented as a lowercase character in the occurrence list.
    */
-  def wordOccurrences(w: Word): Occurrences = ???
+  def wordOccurrences(w: Word): Occurrences =
+    ((w.toLowerCase groupBy (char => char)).toList
+        map {case (char, str) => char -> str.length}) sortWith (_._1 < _._1)
 
   /** Converts a sentence into its character occurrence list. */
-  def sentenceOccurrences(s: Sentence): Occurrences = ???
-
+  def sentenceOccurrences(s: Sentence): Occurrences = {
+    ((s flatMap wordOccurrences).foldLeft(Map[Char, Int]() withDefaultValue 0)((acc, pair) => {
+      acc + (pair._1 -> (acc(pair._1) + pair._2)) 
+    })).toList sortWith (_._1 < _._1)
+  }
+    
   /** The `dictionaryByOccurrences` is a `Map` from different occurrences to a sequence of all
    *  the words that have that occurrence count.
    *  This map serves as an easy way to obtain all the anagrams of a word given its occurrence list.
@@ -53,10 +59,18 @@ object Anagrams {
    *    List(('a', 1), ('e', 1), ('t', 1)) -> Seq("ate", "eat", "tea")
    *
    */
-  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = ???
+  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] =
+    dictionary groupBy (word => wordOccurrences(word))
 
   /** Returns all the anagrams of a given word. */
-  def wordAnagrams(word: Word): List[Word] = ???
+  def wordAnagrams(word: Word): List[Word] = {
+    dictionaryByOccurrences get (wordOccurrences(word)) match {
+      case Some(x) => x
+      case None => List()
+    }
+  }
+    
+    
 
   /** Returns the list of all subsets of the occurrence list.
    *  This includes the occurrence itself, i.e. `List(('k', 1), ('o', 1))`
@@ -80,7 +94,15 @@ object Anagrams {
    *  Note that the order of the occurrence list subsets does not matter -- the subsets
    *  in the example above could have been displayed in some other order.
    */
-  def combinations(occurrences: Occurrences): List[Occurrences] = ???
+  def combinations(occurrences: Occurrences): List[Occurrences] = {
+    def loop(occurrences: Occurrences, acc: List[Occurrences]): List[Occurrences] = {
+      occurrences match {
+        case Nil => Nil
+        // TODO: case x :: xs => for (i <- 1 to x._2; j <- acc) yield ((x._1, i) :: j) ++ loop(xs, acc)
+      }
+    }
+    loop(occurrences, Nil)
+  }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
    * 
