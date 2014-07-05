@@ -60,7 +60,7 @@ object Anagrams {
    *
    */
   lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] =
-    dictionary groupBy (word => wordOccurrences(word))
+    dictionary groupBy (word => wordOccurrences(word)) withDefaultValue Nil
 
   /** Returns all the anagrams of a given word. */
   def wordAnagrams(word: Word): List[Word] = {
@@ -95,13 +95,16 @@ object Anagrams {
    *  in the example above could have been displayed in some other order.
    */
   def combinations(occurrences: Occurrences): List[Occurrences] = {
-    def loop(occurrences: Occurrences, acc: List[Occurrences]): List[Occurrences] = {
+    def loop(occurrences: Occurrences): List[Occurrences] = {
       occurrences match {
-        case Nil => Nil
-        // TODO: case x :: xs => for (i <- 1 to x._2; j <- acc) yield ((x._1, i) :: j) ++ loop(xs, acc)
+        case Nil => List(List())
+        case x :: xs => for (i <- (0 to x._2).toList; j <- loop(xs)) yield i match {
+          case 0 => j
+          case _ => (x._1, i) :: j
+        }
       }
     }
-    loop(occurrences, Nil)
+    loop(occurrences)
   }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
@@ -114,7 +117,12 @@ object Anagrams {
    *  Note: the resulting value is an occurrence - meaning it is sorted
    *  and has no zero-entries.
    */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = ???
+  def subtract(x: Occurrences, y: Occurrences): Occurrences = {
+    y.foldLeft(x.toMap)({case (xmap, (char, num)) =>(xmap get char) match {
+      case Some(x) => if (x == num) xmap - char else xmap + (char -> (x - num))
+      case None => throw new Error("y is not a subset of x")
+    }}).toList sortWith (_._1 < _._1)
+  }
 
   /** Returns a list of all anagram sentences of the given sentence.
    *  
@@ -156,6 +164,15 @@ object Anagrams {
    *
    *  Note: There is only one anagram of an empty sentence.
    */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
+    val occurrences = sentenceOccurrences(sentence)
+    def loop(occurrences: Occurrences): List[Sentence] = occurrences match {
+      case Nil => List(List())
+      case _ =>
+        for (comb <- combinations(occurrences); word <- dictionaryByOccurrences(comb); rest <- loop(subtract(occurrences, comb)))
+          yield word :: rest
+    }
+    loop(occurrences)
+  }
 
 }
